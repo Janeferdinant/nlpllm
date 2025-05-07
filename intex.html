@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Reading Cards</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      color: #1e40af;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.2rem;
+      color: #4b5563;
+      margin-bottom: 20px;
+    }
+    #cards {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .card:hover {
+      background-color: #e0f7fa;
+      transform: scale(1.05);
+    }
+    .card.selected {
+      background-color: #add8e6;
+    }
+    canvas {
+      border: 2px solid #333;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Interactive Reading Cards</h1>
+  <p>Click a word to hear it and see its animation!</p>
+  <div id="cards">
+    <div class="card" data-word="cat">Cat</div>
+    <div class="card" data-word="dog">Dog</div>
+    <div class="card" data-word="bird">Bird</div>
+  </div>
+  <canvas id="animationCanvas"></canvas>
+  <script>
+    let currentAnimation = null;
+
+    // Define words and their animations
+    const words = [
+      { name: 'cat', animation: drawCat },
+      { name: 'dog', animation: drawDog },
+      { name: 'bird', animation: drawBird }
+    ];
+
+    // Setup p5.js canvas
+    function setup() {
+      const canvas = createCanvas(400, 400);
+      canvas.parent('animationCanvas');
+      textAlign(CENTER, CENTER);
+      textSize(24);
+    }
+
+    // Main draw loop
+    function draw() {
+      background(255);
+      if (currentAnimation) {
+        currentAnimation();
+      } else {
+        fill(0);
+        text('Click a card to start!', width / 2, height / 2);
+      }
+    }
+
+    // Animation functions
+    function drawCat() {
+      fill(255, 165, 0);
+      ellipse(200, 200, 100, 100); // Body
+      fill(0);
+      ellipse(180, 190, 20, 20); // Left eye
+      ellipse(220, 190, 20, 20); // Right eye
+      if (frameCount % 60 < 30) {
+        fill(255);
+        ellipse(180, 190, 10, 10); // Left eye blink
+        ellipse(220, 190, 10, 10); // Right eye blink
+      }
+      triangle(200, 200, 195, 210, 205, 210); // Nose
+      // Whiskers
+      stroke(0);
+      line(170, 195, 150, 190);
+      line(170, 195, 150, 200);
+      line(230, 195, 250, 190);
+      line(230, 195, 250, 200);
+      noStroke();
+    }
+
+    function drawDog() {
+      fill(165, 42, 42);
+      rect(150, 180, 100, 50); // Body
+      ellipse(150, 150, 50, 50); // Head
+      fill(0);
+      ellipse(140, 145, 10, 10); // Left eye
+      ellipse(160, 145, 10, 10); // Right eye
+      triangle(150, 150, 145, 160, 155, 160); // Nose
+      // Tail wag
+      push();
+      translate(250, 200);
+      rotate(sin(frameCount * 0.1) * 0.5);
+      rect(0, 0, 30, 10);
+      pop();
+    }
+
+    function drawBird() {
+      fill(255, 255, 0);
+      ellipse(200, 200, 50, 30); // Body
+      ellipse(220, 190, 20, 20); // Head
+      fill(0);
+      triangle(230, 190, 240, 190, 235, 185); // Beak
+      // Wings flap
+      push();
+      translate(200, 200);
+      rotate(sin(frameCount * 0.1) * 0.5);
+      rect(-30, -10, 60, 20);
+      pop();
+    }
+
+    // Add event listeners to cards
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const word = card.dataset.word;
+        speak(word);
+        setAnimation(word);
+      });
+    });
+
+    // Set current animation
+    function setAnimation(word) {
+      const wordData = words.find(w => w.name === word);
+      currentAnimation = wordData ? wordData.animation : null;
+    }
+
+    // Speak the word
+    function speak(word) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>

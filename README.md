@@ -202,5 +202,71 @@ The `index.html` file provides a simple, effective hub for accessing three educa
     <li><a href="learnsmart/">LearnSmart</a></li>
     <li><a href="readingcards/">Interactive Reading Cards</a></li>
   <li><a href="class/">Word Catch</a></li>
-    <li><a href="game/">LearnSmart</a></li>
+    <li><a href="game2/">LearnSmart</a></li>
     <li><a href="r/">Interactive Reading Cards</a></li>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnSmart Educational Apps</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #1e40af;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      max-width: 600px;
+      width: 100%;
+    }
+    li {
+      margin: 15px 0;
+    }
+    a {
+      text-decoration: none;
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 15px 30px;
+      background-color: #3b82f6;
+      border-radius: 10px;
+      display: inline-block;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    a:hover {
+      background-color: #2563eb;
+      transform: scale(1.05);
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+      a {
+        font-size: 1rem;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>LearnSmart Educational Apps</h1>
+  <ul>
+    <li><a href="wordcatch/">Word Catch</a></li>
+    <li><a href="learnsmart/">LearnSmart</a></li>
+    <li><a href="readingcards/">Interactive Reading Cards</a></li>
+  </ul>
+</body>
+</html>

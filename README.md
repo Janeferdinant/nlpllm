@@ -197,3 +197,10 @@ The `index.html` file provides a simple, effective hub for accessing three educa
 - [PBS KIDS: Educational Games]([invalid url, do not cite])
 - [Vooks: Animated Storybooks]([invalid url, do not cite])
 - [K5 Learning: Educational Resources]([invalid url, do not cite])
+-
+-  <li><a href="wordcatch/">Word Catch</a></li>
+    <li><a href="learnsmart/">LearnSmart</a></li>
+    <li><a href="readingcards/">Interactive Reading Cards</a></li>
+  <li><a href="class/">Word Catch</a></li>
+    <li><a href="game/">LearnSmart</a></li>
+    <li><a href="r/">Interactive Reading Cards</a></li>

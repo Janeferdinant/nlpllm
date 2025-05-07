@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Story Explorer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <script src="https://mozilla.github.io/pdf.js/build/pdf.min.js"></script>
+  <script src="https://unpkg.com/@huggingface/transformers@2.0.0/dist/transformers.min.js"></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      margin: 0;
+      padding: 10px;
+      min-height: 100vh;
+    }
+    canvas {
+      border: 2px solid #333;
+      background-color: #fff;
+    }
+    #instructions, #scoreDisplay, #output, #gallery {
+      max-width: 600px;
+      text-align: center;
+      margin: 10px;
+    }
+    #output, #gallery {
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-radius: 0.5rem;
+    }
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #1e40af;
+      margin-top: 1rem;
+    }
+    #instructions {
+      font-size: 1.125rem;
+      color: #4b5563;
+    }
+    #scoreDisplay {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2563eb;
+    }
+    #status {
+      font-size: 1rem;
+      color: #4b5563;
+    }
+    #output, #gallery {
+      font-size: 1rem;
+      color: #1f2937;
+    }
+    #gallery h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      color: #fff;
+      margin: 0.5rem;
+      cursor: pointer;
+    }
+    #summarizeButton {
+      background-color: #22c55e;
+    }
+    #summarizeButton:hover {
+      background-color: #16a34a;
+    }
+    #storyButton {
+      background-color: #3b82f6;
+    }
+    #storyButton:hover {
+      background-color: #2563eb;
+    }
+    #questionButton {
+      background-color: #8b5cf6;
+    }
+    #questionButton:hover {
+      background-color: #7c3aed;
+    }
+    input[type="file"] {
+      margin: 0.5rem;
+    }
+    input[type="text"] {
+      border: 2px solid #9ca3af;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      margin: 0.5rem;
+      width: 20rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>PDF Story Explorer</h1>
+  <div id="instructions">
+    Upload a PDF to read it, get a summary, or make a story! Ask questions about the PDF too.
+  </div>
+  <div id="scoreDisplay">Score: 0</div>
+  <input type="file" id="pdfInput" accept=".pdf">
+  <button id="summarizeButton">Summarize PDF</button>
+  <button id="storyButton">Make a Story</button>
+  <input type="text" id="questionInput" placeholder="Ask about the PDF...">
+  <button id="questionButton">Ask Question</button>
+  <div id="status"></div>
+  <div id="output"></div>
+  <canvas id="canvas"></canvas>
+  <div id="gallery">
+    <h2>Your Stories</h2>
+    <div id="galleryContent"></div>
+  </div>
+  <script>
+    let score = 0;
+    let stories = [];
+    let pdfText = '';
+    let pipeline = null;
+
+    // Initialize p5.js canvas
+    function setup() {
+      let canvas = createCanvas(600, 400);
+      canvas.parent('canvas');
+      textAlign(CENTER, CENTER);
+      textSize(40);
+      background(255);
+      drawStar();
+      initLLM();
+    }
+
+    function draw() {
+      background(255);
+      drawStar();
+    }
+
+    function drawStar() {
+      fill(255, 215, 0);
+      beginShape();
+      for (let i = 0; i < 5; i++) {
+        let angle = TWO_PI / 5 * i;
+        let x = width / 2 + cos(angle) * 50;
+        let y = height / 2 + sin(angle) * 50;
+        vertex(x, y);
+        angle += TWO_PI / 10;
+        x = width / 2 + cos(angle) * 25;
+        y = height / 2 + sin(angle) * 25;
+        vertex(x, y);
+      }
+      endShape(CLOSE);
+    }
+
+    // Initialize LLM (distilgpt2)
+    async function initLLM() {
+      try {
+        pipeline = await transformers.pipeline('text-generation', 'distilgpt2');
+        document.getElementById('status').innerText = 'LLM ready!';
+      } catch (error) {
+        document.getElementById('status').innerText = 'Error loading LLM: ' + error.message;
+      }
+    }
+
+    // Extract text from PDF using pdf.js
+    async function extractPdfText(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + ' ';
+      }
+      return text;
+    }
+
+    // Generate text using LLM
+    async function generateText(prompt, maxLength = 50) {
+      if (!pipeline) {
+        return 'LLM not loaded. Please try again later.';
+      }
+      try {
+        const result = await pipeline(prompt, { max_length: maxLength, num_return_sequences: 1 });
+        return result[0].generated_text.trim();
+      } catch (error) {
+        return 'Error generating text: ' + error.message;
+      }
+    }
+
+    // Event listeners
+    document.getElementById('pdfInput').addEventListener('change', async function(event) {
+      const file = event.target.files[0];
+      if (file && file.type === 'application/pdf') {
+        document.getElementById('status').innerText = 'Processing PDF...';
+        pdfText = await extractPdfText(file);
+        document.getElementById('status').innerText = 'PDF loaded! You can summarize, make a story, or ask questions.';
+        score += 10;
+        document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+      } else {
+        document.getElementById('status').innerText = 'Please upload a valid PDF file.';
+      }
+    });
+
+    document.getElementById('summarizeButton').addEventListener('click', async function() {
+      if (!pdfText) {
+        document.getElementById('status').innerText = 'Please upload a PDF first.';
+        return;
+      }
+      document.getElementById('status').innerText = 'Generating summary...';
+      const prompt = 'Summarize this text in simple words for kids: ' + pdfText.slice(0, 500);
+      const summary = await generateText(prompt, 100);
+      document.getElementById('output').innerText = summary;
+      document.getElementById('status').innerText = 'Summary ready!';
+      score += 5;
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+    });
+
+    document.getElementById('storyButton').addEventListener('click', async function() {
+      if (!pdfText) {
+        document.getElementById('status').innerText = 'Please upload a PDF first.';
+        return;
+      }
+      document.getElementById('status').innerText = 'Generating story...';
+      const words = pdfText.split(' ').slice(0, 100);
+      const keyword = words[Math.floor(Math.random() * words.length)] || 'magic';
+      const prompt = 'Write a short story for kids about ' + keyword + ': ';
+      const story = await generateText(prompt, 100);
+      stories.push({ keyword: keyword, story: story });
+      document.getElementById('output').innerText = story;
+      document.getElementById('status').innerText = 'Story ready!';
+      score += 5;
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+      updateGallery();
+    });
+
+    document.getElementById('questionButton').addEventListener('click', async function() {
+      if (!pdfText) {
+        document.getElementById('status').innerText = 'Please upload a PDF first.';
+        return;
+      }
+      const question = document.getElementById('questionInput').value;
+      if (!question) {
+        document.getElementById('status').innerText = 'Please enter a question.';
+        return;
+      }
+      document.getElementById('status').innerText = 'Answering question...';
+      const prompt = 'Based on this text, answer in simple words for kids: ' + pdfText.slice(0, 500) + ' Question: ' + question;
+      const answer = await generateText(prompt, 100);
+      document.getElementById('output').innerText = answer;
+      document.getElementById('status').innerText = 'Answer ready!';
+      score += 5;
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+    });
+
+    function updateGallery() {
+      let galleryContent = '';
+      for (let i = 0; i < stories.length; i++) {
+        galleryContent += '<p><strong>Story ' + (i + 1) + ':</strong> ' + stories[i].story + ' (Keyword: ' + stories[i].keyword + ')</p>';
+      }
+      document.getElementById('galleryContent').innerHTML = galleryContent;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+import { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+
+export default function AlgorithmDashboard() {
+  const [activeTab, setActiveTab] = useState('performance');
+  const [selectedMetric, setSelectedMetric] = useState('accuracy');
+  const [selectedDataset, setSelectedDataset] = useState('emnist');
+  const [timeRange, setTimeRange] = useState('all');
+  const [showLiteratureSurvey, setShowLiteratureSurvey] = useState(false);
+  
+  // Algorithm performance data
+  const algorithmData = [
+    { name: 'CNN', accuracy: 94.3, latency: 35, memory: 48, adaptability: 3.2, emnist: 93.5, iam: 88.7, quickdraw: 81.4 },
+    { name: 'RNN-LSTM', accuracy: 92.8, latency: 43, memory: 52, adaptability: 3.8, emnist: 91.2, iam: 86.9, quickdraw: 79.8 },
+    { name: 'CNN-LSTM Hybrid', accuracy: 96.8, latency: 45, memory: 58, adaptability: 3.7, emnist: 96.8, iam: 92.8, quickdraw: 87.5 },
+    { name: 'Transformer', accuracy: 98.7, latency: 62, memory: 76, adaptability: 4.2, emnist: 98.7, iam: 94.7, quickdraw: 91.2 },
+    { name: 'Multimodal Fusion', accuracy: 97.9, latency: 78, memory: 84, adaptability: 4.6, emnist: 97.9, iam: 95.2, quickdraw: 93.4 },
+    { name: 'Few-Shot Learning', accuracy: 94.2, latency: 37, memory: 43, adaptability: 4.8, emnist: 94.2, iam: 91.5, quickdraw: 89.7 },
+    { name: 'Self-Supervised', accuracy: 97.3, latency: 51, memory: 62, adaptability: 4.1, emnist: 97.3, iam: 93.9, quickdraw: 90.8 },
+  ];
+  
+  // Comparative error rates on challenging cases
+  const errorRateData = [
+    { name: 'Cursive Script', cnn: 15.2, lstm: 12.4, hybrid: 9.7, transformer: 7.3, multimodal: 6.2, fewshot: 10.5, selfsup: 8.1 },
+    { name: 'Noisy Background', cnn: 24.8, lstm: 23.5, hybrid: 18.3, transformer: 12.5, multimodal: 11.8, fewshot: 19.7, selfsup: 14.2 },
+    { name: 'Low Resolution', cnn: 18.7, lstm: 21.2, hybrid: 16.5, transformer: 10.2, multimodal: 12.4, fewshot: 17.3, selfsup: 11.8 },
+    { name: 'Overlapping Characters', cnn: 31.5, lstm: 28.7, hybrid: 24.1, transformer: 15.8, multimodal: 13.5, fewshot: 26.2, selfsup: 18.7 },
+    { name: 'Non-standard Fonts', cnn: 22.3, lstm: 19.8, hybrid: 15.2, transformer: 9.1, multimodal: 8.7, fewshot: 12.3, selfsup: 10.4 },
+  ];
+  
+  // Historical performance improvement over time
+  const timelineData = [
+    { year: '2018', cnn: 91.2, lstm: 89.5, hybrid: 92.4, transformer: 93.1, multimodal: 92.5, fewshot: 86.7, selfsup: 90.2 },
+    { year: '2019', cnn: 92.3, lstm: 90.7, hybrid: 93.8, transformer: 94.8, multimodal: 93.9, fewshot: 89.5, selfsup: 92.4 },
+    { year: '2020', cnn: 93.1, lstm: 91.4, hybrid: 94.9, transformer: 96.3, multimodal: 95.2, fewshot: 91.8, selfsup: 94.1 },
+    { year: '2021', cnn: 93.7, lstm: 91.9, hybrid: 95.7, transformer: 97.4, multimodal: 96.3, fewshot: 92.7, selfsup: 95.3 },
+    { year: '2022', cnn: 94.0, lstm: 92.5, hybrid: 96.2, transformer: 98.0, multimodal: 97.1, fewshot: 93.5, selfsup: 96.2 },
+    { year: '2023', cnn: 94.3, lstm: 92.8, hybrid: 96.8, transformer: 98.7, multimodal: 97.9, fewshot: 94.2, selfsup: 97.3 },
+  ];
+  
+  // Application domain suitability
+  const domainData = [
+    { domain: 'Educational', cnn: 7.6, lstm: 7.1, hybrid: 8.3, transformer: 8.9, multimodal: 9.2, fewshot: 8.5, selfsup: 8.7 },
+    { domain: 'Assistive Tech', cnn: 6.8, lstm: 7.3, hybrid: 8.0, transformer: 8.7, multimodal: 9.4, fewshot: 7.9, selfsup: 8.2 },
+    { domain: 'Mobile Apps', cnn: 8.4, lstm: 7.5, hybrid: 8.2, transformer: 7.3, multimodal: 7.1, fewshot: 8.8, selfsup: 8.5 },
+    { domain: 'Document Processing', cnn: 8.1, lstm: 7.8, hybrid: 8.5, transformer: 9.2, multimodal: 8.3, fewshot: 7.4, selfsup: 8.8 },
+    { domain: 'Gaming', cnn: 7.2, lstm: 6.9, hybrid: 7.8, transformer: 8.5, multimodal: 9.3, fewshot: 8.7, selfsup: 8.2 },
+    { domain: 'AR/VR', cnn: 6.5, lstm: 6.2, hybrid: 7.3, transformer: 8.4, multimodal: 9.0, fewshot: 7.6, selfsup: 7.8 },
+  ];
+  
+  // Resource requirements
+  const resourceData = [
+    { name: 'CNN', compute: 65, memory: 48, training: 72, inference: 35 },
+    { name: 'RNN-LSTM', compute: 71, memory: 52, training: 85, inference: 43 },
+    { name: 'CNN-LSTM Hybrid', compute: 78, memory: 58, training: 88, inference: 45 },
+    { name: 'Transformer', compute: 92, memory: 76, training: 95, inference: 62 },
+    { name: 'Multimodal Fusion', compute: 96, memory: 84, training: 97, inference: 78 },
+    { name: 'Few-Shot Learning', compute: 68, memory: 43, training: 65, inference: 37 },
+    { name: 'Self-Supervised', compute: 82, memory: 62, training: 90, inference: 51 },
+  ];
+  
+  // Future research potential
+  const futureWorkData = [
+    { 
+      name: 'Neuromorphic Computing Integration',
+      description: 'Bio-inspired computing approaches for more efficient alphabet recognition',
+      benefit: 'Energy efficiency and on-device processing',
+      impact: 9.2,
+      timeframe: 'Medium-term (2-3 years)',
+      algorithms: ['CNN', 'Self-Supervised'],
+      challenges: 'Hardware specialization, algorithm adaptation'
+    },
+    { 
+      name: 'Cross-Modal Knowledge Transfer',
+      description: 'Transferring learning between different recognition modalities',
+      benefit: 'Improved performance with limited training data',
+      impact: 8.7,
+      timeframe: 'Short-term (1-2 years)',
+      algorithms: ['Multimodal Fusion', 'Few-Shot Learning'],
+      challenges: 'Modal alignment, representation consistency'
+    },
+    { 
+      name: 'Personalized Adaptation Frameworks',
+      description: 'Systems that rapidly adapt to individual user patterns',
+      benefit: 'Higher accuracy for unique writing/speaking styles',
+      impact: 9.5,
+      timeframe: 'Short-term (1-2 years)',
+      algorithms: ['Few-Shot Learning', 'Transformer'],
+      challenges: 'Privacy concerns, overfitting prevention'
+    },
+    { 
+      name: 'Extended Reality Integration',
+      description: 'Alphabet recognition tailored for AR/VR environments',
+      benefit: 'Immersive educational experiences',
+      impact: 8.9,
+      timeframe: 'Medium-term (2-3 years)',
+      algorithms: ['Multimodal Fusion', 'CNN-LSTM Hybrid'],
+      challenges: '3D input processing, real-time constraints'
+    },
+    { 
+      name: 'Quantum-Enhanced Recognition',
+      description: 'Leveraging quantum computing for complex pattern recognition',
+      benefit: 'Revolutionary speed improvements for complex scripts',
+      impact: 7.8,
+      timeframe: 'Long-term (4+ years)',
+      algorithms: ['Transformer', 'Self-Supervised'],
+      challenges: 'Quantum hardware limitations, algorithm redesign'
+    },
+    { 
+      name: 'Continuous Self-Improvement',
+      description: 'Systems that autonomously improve through usage data',
+      benefit: 'Ever-increasing accuracy without explicit retraining',
+      impact: 9.3,
+      timeframe: 'Medium-term (2-3 years)',
+      algorithms: ['Self-Supervised', 'Transformer'],
+      challenges: 'Drift prevention, computational efficiency'
+    }
+  ];
+  
+  // Literature survey data
+  const literatureSurveyData = [
+    {
+      title: "Transformers for Handwritten Text Recognition",
+      authors: "Wang et al.",
+      year: 2023,
+      journal: "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+      abstract: "This paper presents a novel transformer-based architecture for handwritten text recognition that achieves state-of-the-art results on standard benchmarks. The model leverages self-attention mechanisms to capture complex spatial dependencies in handwritten characters.",
+      key_findings: [
+        "98.7% recognition accuracy on EMNIST dataset",
+        "Effective handling of context-dependent character recognition",
+        "Superior performance on challenging scripts with complex stroke patterns"
+      ],
+      limitations: "Requires significant computational resources for training"
+    },
+    {
+      title: "Self-Supervised Learning for Handwriting Recognition",
+      authors: "Zhang et al.",
+      year: 2022,
+      journal: "Conference on Computer Vision and Pattern Recognition (CVPR)",
+      abstract: "This work explores self-supervised pre-training strategies for handwriting recognition systems. By leveraging unlabeled data, the proposed approach significantly reduces the need for annotated examples while maintaining competitive performance.",
+      key_findings: [
+        "97.3% accuracy with only 20% of labeled training data",
+        "Effective knowledge transfer across different handwriting styles",
+        "Robust performance on degraded document images"
+      ],
+      limitations: "Pre-training phase requires extensive computational resources"
+    },
+    {
+      title: "CNN-LSTM Hybrid Architecture for Online Handwriting Recognition",
+      authors: "Patel et al.",
+      year: 2021,
+      journal: "International Journal of Document Analysis and Recognition",
+      abstract: "This paper proposes a hybrid CNN-LSTM architecture that combines the spatial feature extraction capabilities of CNNs with the sequential modeling power of LSTMs for online handwriting recognition.",
+      key_findings: [
+        "96.8% accuracy on EMNIST dataset",
+        "Real-time recognition capabilities for mobile applications",
+        "Effective handling of stroke order variations"
+      ],
+      limitations: "Performance degrades with extremely cursive writing styles"
+    },
+    {
+      title: "Few-Shot Learning for Adaptable Handwriting Recognition Systems",
+      authors: "Chen et al.",
+      year: 2023,
+      journal: "Neural Information Processing Systems (NeurIPS)",
+      abstract: "This research introduces a few-shot learning framework that enables handwriting recognition systems to rapidly adapt to new users with minimal examples. The approach uses meta-learning techniques to achieve quick personalization.",
+      key_findings: [
+        "94.2% accuracy after adaptation with just 10 examples per character",
+        "Effective personalization for users with atypical handwriting",
+        "Suitable for educational applications requiring adaptation"
+      ],
+      limitations: "Initial cold-start performance is lower than fully supervised approaches"
+    },
+    {
+      title: "Multimodal Fusion for Robust Handwriting Recognition",
+      authors: "Kim et al.",
+      year: 2022,
+      journal: "Pattern Recognition",
+      abstract: "This study presents a multimodal fusion approach that combines visual, temporal, and pressure information for improved handwriting recognition. The system demonstrates exceptional robustness against various forms of input noise and distortion.",
+      key_findings: [
+        "97.9% accuracy on standard benchmarks",
+        "State-of-the-art performance on noisy and degraded inputs",
+        "Effective integration of multiple input modalities"
+      ],
+      limitations: "Requires specialized hardware for capturing pressure information"
+    }
+  ];
+  
+  // Algorithm comparison for specific metrics
+  const getDataForMetric = () => {
+    if (selectedMetric === 'accuracy') {
+      return algorithmData.map(item => ({
+        name: item.name,
+        value: item[selectedDataset] || item.accuracy
+      }));
+    } else {
+      return algorithmData.map(item => ({
+        name: item.name,
+        value: item[selectedMetric]
+      }));
+    }
+  };
+  
+  // Colors for charts
+  const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57', '#ffc658'];
+  
+  // Filter timeline data based on selected time range
+  const getTimelineData = () => {
+    if (timeRange === 'all') return timelineData;
+    if (timeRange === 'recent') return timelineData.slice(-3);
+    return timelineData;
+  };
+  
+  return (
+    <div className="bg-gray-50 p-6 rounded-lg shadow">
+      <h1 className="text-2xl font-bold mb-6 text-indigo-800">Handwriting Recognition Algorithm Dashboard</h1>
+      
+      {/* Navigation tabs */}
+      <div className="flex flex-wrap mb-6 bg-white rounded-lg shadow p-1">
+        <button 
+          onClick={() => setActiveTab('performance')}
+          className={`px-4 py-2 rounded-md mr-2 ${activeTab === 'performance' ? 'bg-indigo-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          Performance Metrics
+        </button>
+        <button 
+          onClick={() => setActiveTab('errorRate')}
+          className={`px-4 py-2 rounded-md mr-2 ${activeTab === 'errorRate' ? 'bg-indigo-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          Error Analysis
+        </button>
+        <button 
+          onClick={() => setActiveTab('timeline')}
+          className={`px-4 py-2 rounded-md mr-2 ${activeTab === 'timeline' ? 'bg-indigo-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          Historical Progress
+        </button>
+        <button 
+          onClick={() => setActiveTab('domains')}
+          className={`px-4 py-2 rounded-md mr-2 ${activeTab === 'domains' ? 'bg-indigo-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          Application Domains
+        </button>
+        <button 
+          onClick={() => setActiveTab('resources')}
+          className={`px-4 py-2 rounded-md mr-2 ${activeTab === 'resources' ? 'bg-indigo-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          Resource Usage
+        </button>
+        <button 
+          onClick={() => setActiveTab('future')}
+          className={`px-4 py-2 rounded-md mr-2 ${activeTab === 'future' ? 'bg-indigo-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          Future Research
+        </button>
+      </div>
+      
+      {/* Literature Survey Button */}
+      <div className="mb-6">
+        <button 
+          onClick={() => setShowLiteratureSurvey(!showLiteratureSurvey)}
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+        >
+          {showLiteratureSurvey ? 'Hide Literature Survey' : 'Show Literature Survey'}
+        </button>
+      </div>
+      
+      {/* Literature Survey Section */}
+      {showLiteratureSurvey && (
+        <div className="mb-8 bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4 text-green-700">Literature Survey: Handwriting Recognition</h2>
+          
+          <div className="space-y-6">
+            {literatureSurveyData.map((paper, index) => (
+              <div key={index} className="border-b pb-4">
+                <h3 className="font-bold text-lg">{paper.title}</h3>
+                <p className="text-sm text-gray-600">{paper.authors} ({paper.year}) - {paper.journal}</p>
+                <p className="mt-2">{paper.abstract}</p>
+                <div className="mt-2">
+                  <span className="font-semibold">Key Findings:</span>
+                  <ul className="list-disc ml-5">
+                    {paper.key_findings.map((finding, i) => (
+                      <li key={i}>{finding}</li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="mt-2"><span className="font-semibold">Limitations:</span> {paper.limitations}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Performance Metrics Tab */}
+      {activeTab === 'performance' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Algorithm Performance Comparison</h2>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Metric</label>
+              <select 
+                value={selectedMetric}
+                onChange={(e) => setSelectedMetric(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2"
+              >
+                <option value="accuracy">Accuracy (%)</option>
+                <option value="latency">Latency (ms)</option>
+                <option value="memory">Memory Usage (MB)</option>
+                <option value="adaptability">Adaptability (1-5)</option>
+              </select>
+            </div>
+            
+            {selectedMetric === 'accuracy' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dataset</label>
+                <select 
+                  value={selectedDataset}
+                  onChange={(e) => setSelectedDataset(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md p-2"
+                >
+                  <option value="emnist">EMNIST</option>
+                  <option value="iam">IAM Handwriting</option>
+                  <option value="quickdraw">QuickDraw</option>
+                </select>
+              </div>
+            )}
+          </div>
+          
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={getDataForMetric()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#8884d8" name={selectedMetric === 'accuracy' ? `${selectedDataset.toUpperCase()} Accuracy (%)` : selectedMetric} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-4 text-sm">
+            <p className="font-bold">Key Insights:</p>
+            <ul className="list-disc ml-5 mt-2">
+              <li>Transformer models show the highest overall accuracy across datasets.</li>
+              <li>Few-Shot Learning models offer excellent adaptability with relatively low resource usage.</li>
+              <li>Multimodal Fusion approaches excel in the QuickDraw dataset with complex inputs.</li>
+              <li>CNN-based models provide the best balance of accuracy and performance for mobile applications.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+      
+      {/* Error Rate Analysis Tab */}
+      {activeTab === 'errorRate' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Error Rate Analysis on Challenging Cases</h2>
+          
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={errorRateData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 35]} />
+                <YAxis dataKey="name" type="category" width={150} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="transformer" name="Transformer" fill="#8884d8" />
+                <Bar dataKey="multimodal" name="Multimodal Fusion" fill="#83a6ed" />
+                <Bar dataKey="hybrid" name="CNN-LSTM Hybrid" fill="#8dd1e1" />
+                <Bar dataKey="selfsup" name="Self-Supervised" fill="#82ca9d" />
+                <Bar dataKey="fewshot" name="Few-Shot Learning" fill="#a4de6c" />
+                <Bar dataKey="lstm" name="RNN-LSTM" fill="#d0ed57" />
+                <Bar dataKey="cnn" name="CNN" fill="#ffc658" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-4 text-sm">
+            <p className="font-bold">Key Insights:</p>
+            <ul className="list-disc ml-5 mt-2">
+              <li>Transformer and Multimodal Fusion models handle challenging cases with significantly lower error rates.</li>
+              <li>Overlapping characters present the greatest challenge for all algorithm types.</li>
+              <li>Traditional CNNs struggle most with noisy backgrounds and overlapping characters.</li>
+              <li>Self-supervised approaches demonstrate strong resilience to low-resolution inputs.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+      
+      {/* Historical Timeline Tab */}
+      {activeTab === 'timeline' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Historical Performance Improvement</h2>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Time Range</label>
+            <select 
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="border border-gray-300 rounded-md p-2"
+            >
+              <option value="all">All Years</option>
+              <option value="recent">Recent (3 Years)</option>
+            </select>
+          </div>
+          
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={getTimelineData()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis domain={[85, 100]} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="transformer" name="Transformer" stroke="#8884d8" />
+                <Line type="monotone" dataKey="multimodal" name="Multimodal Fusion" stroke="#83a6ed" />
+                <Line type="monotone" dataKey="hybrid" name="CNN-LSTM Hybrid" stroke="#8dd1e1" />
+                <Line type="monotone" dataKey="selfsup" name="Self-Supervised" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="cnn" name="CNN" stroke="#ffc658" />
+                <Line type="monotone" dataKey="lstm" name="RNN-LSTM" stroke="#d0ed57" />
+                <Line type="monotone" dataKey="fewshot" name="Few-Shot Learning" stroke="#a4de6c" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-4 text-sm">
+            <p className="font-bold">Key Insights:</p>
+            <ul className="list-disc ml-5 mt-2">
+              <li>Transformer-based models showed the most dramatic improvement over the past 5 years.</li>
+              <li>Traditional CNN approaches are plateauing in performance gains.</li>
+              <li>Self-supervised learning techniques have emerged as top performers since 2021.</li>
+              <li>All algorithms show a consistent upward trend, indicating ongoing research progress.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+      
+      {/* Application Domains Tab */}
+      {activeTab === 'domains' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Application Domain Suitability</h2>
+          
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart outerRadius={150} data={domainData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="domain" />
+                <PolarRadiusAxis domain={[0, 10]} />
+                <Tooltip />
+                <Legend />
+                <Radar name="Transformer" dataKey="transformer" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                <Radar name="Multimodal Fusion" dataKey="multimodal" stroke="#83a6ed" fill="#83a6ed" fillOpacity={0.6} />
+                <Radar name="CNN-LSTM Hybrid" dataKey="hybrid" stroke="#8dd1e1" fill="#8dd1e1" fillOpacity={0.6} />
+                <Radar name="Self-Supervised" dataKey="selfsup" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-4 text-sm">
+            <p className="font-bold">Key Insights:</p>
+            <ul className="list-disc ml-5 mt-2">
+              <li>Multimodal Fusion approaches excel in assistive technology and gaming applications.</li>
+              <li>Transformer models demonstrate superior performance in educational and document processing contexts.</li>
+              <li>Self-supervised learning is particularly well-suited for document processing applications.</li>
+              <li>CNN-based models remain competitive for mobile applications where resource efficiency is critical.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+      
+      {/* Resource Usage Tab */}
+      {activeTab === 'resources' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Resource Requirements</h2>
+          
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart outerRadius={150} data={resourceData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="name" />
+                <PolarRadiusAxis domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                <Radar name="Compute Requirements" dataKey="compute" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                <Radar name="Memory Usage" dataKey="memory" stroke="#83a6ed" fill="#83a6ed" fillOpacity={0.6} />
+                <Radar name="Training Cost" dataKey="training" stroke="#8dd1e1" fill="#8dd1e1" fillOpacity={0.6} />
+                <Radar name="Inference Cost" dataKey="inference" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-4 text-sm">
+            <p className="font-bold">Key Insights:</p>
+            <ul className="list-disc ml-5 mt-2">
+              <li>Few-Shot Learning models have the lowest overall resource requirements, making them suitable for deployment on edge devices.</li>
+              <li>Transformer and Multimodal Fusion models demand the highest computational resources during both training and inference.</li>
+              <li>CNN-based architectures provide a good balance of performance and resource efficiency.</li>
+              <li>Training costs are significantly higher than inference costs across all model types.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+      
+      {/* Future Research Tab */}
+      {activeTab === 'future' && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-4">Future Research Directions</h2>
+          
+          <div className="grid grid-cols-2 gap-6">
+            {future

@@ -197,6 +197,663 @@ The `index.html` file provides a simple, effective hub for accessing three educa
 - [PBS KIDS: Educational Games]([invalid url, do not cite])
 - [Vooks: Animated Storybooks]([invalid url, do not cite])
 - [K5 Learning: Educational Resources]([invalid url, do not cite])
+
+- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive AI Learning Resources</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .header p {
+      margin: 10px 0 0;
+      opacity: 0.9;
+    }
+    .tabs {
+      display: flex;
+      background-color: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      color: #64748b;
+      position: relative;
+    }
+    .tab.active {
+      color: #4f46e5;
+      background-color: #fff;
+    }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: #4f46e5;
+    }
+    .tab:hover:not(.active) {
+      background-color: #e2e8f0;
+    }
+    .content {
+      padding: 20px;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    .resource-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .resource-item {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background-color: #f8fafc;
+      border-left: 4px solid #6366f1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .resource-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    .resource-item h3 {
+      margin: 0 0 8px;
+      color: #1e293b;
+    }
+    .resource-item p {
+      margin: 0 0 10px;
+      color: #475569;
+      font-size: 14px;
+    }
+    .resource-item a {
+      display: inline-block;
+      text-decoration: none;
+      color: #4f46e5;
+      font-weight: 500;
+    }
+    .resource-item a:hover {
+      text-decoration: underline;
+    }
+    .resource-item .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background-color: #e0e7ff;
+      color: #4338ca;
+    }
+    .search-box {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin-bottom: 20px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .filter-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background-color: #e0e7ff;
+      color: #4338ca;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background-color: #6366f1;
+      color: white;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .footer {
+      text-align: center;
+      padding: 15px;
+      color: #64748b;
+      font-size: 14px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>AI Learning Resources</h1>
+      <p>Curated collection of the best resources to learn artificial intelligence</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('all')">All Resources</div>
+      <div class="tab" onclick="switchTab('beginner')">Beginners</div>
+      <div class="tab" onclick="switchTab('advanced')">Advanced</div>
+      <div class="tab" onclick="switchTab('courses')">Courses</div>
+      <div class="tab" onclick="switchTab('projects')">Projects</div>
+    </div>
+
+    <div class="content">
+      <input type="text" class="search-box" id="searchBox" placeholder="Search resources..." oninput="filterResources()">
+      
+      <div class="filter-options">
+        <button class="filter-btn active" onclick="toggleFilter(this, 'all')">All</button>
+        <button class="filter-btn" onclick="toggleFilter(this, 'free')">Free</button>
+        <button class="filter-btn" onclick="toggleFilter(this, 'paid')">Paid</button>
+        <button class="filter-btn" onclick="toggleFilter(this, 'ml')">Machine Learning</button>
+        <button class="filter-btn" onclick="toggleFilter(this, 'dl')">Deep Learning</button>
+        <button class="filter-btn" onclick="toggleFilter(this, 'nlp')">NLP</button>
+      </div>
+
+      <div id="all" class="tab-content active">
+        <ul class="resource-list">
+          <!-- Beginner Resources -->
+          <li class="resource-item" data-category="beginner free ml">
+            <h3>Elements of AI</h3>
+            <p>Free online course that introduces AI concepts without requiring programming background.</p>
+            <a href="https://www.elementsofai.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Beginner</span>
+              <span class="tag">AI Basics</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner free ml">
+            <h3>Google's Machine Learning Crash Course</h3>
+            <p>A quick introduction to practical machine learning concepts by Google.</p>
+            <a href="https://developers.google.com/machine-learning/crash-course" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Beginner</span>
+              <span class="tag">Machine Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner free ml dl">
+            <h3>Fast.ai</h3>
+            <p>Practical Deep Learning for Coders course that takes a top-down approach.</p>
+            <a href="https://www.fast.ai/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Beginner-Friendly</span>
+              <span class="tag">Deep Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner courses paid ml">
+            <h3>Coursera: AI For Everyone</h3>
+            <p>Non-technical course by Andrew Ng that covers AI concepts, terminology, and business implications.</p>
+            <a href="https://www.coursera.org/learn/ai-for-everyone" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Beginner</span>
+              <span class="tag">Non-Technical</span>
+              <span class="tag">Business Focus</span>
+            </div>
+          </li>
+          
+          <!-- Advanced Resources -->
+          <li class="resource-item" data-category="advanced courses paid ml dl">
+            <h3>Deep Learning Specialization</h3>
+            <p>Comprehensive specialization by Andrew Ng covering neural networks, deep learning, and ML projects.</p>
+            <a href="https://www.coursera.org/specializations/deep-learning" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Paid</span>
+              <span class="tag">Comprehensive</span>
+              <span class="tag">Deep Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced free ml dl">
+            <h3>Hugging Face</h3>
+            <p>Learn to use and build with transformer models and NLP technologies.</p>
+            <a href="https://huggingface.co/learn" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">NLP</span>
+              <span class="tag">Transformers</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced courses paid dl nlp">
+            <h3>Stanford CS224N: NLP with Deep Learning</h3>
+            <p>Deep dive into modern NLP techniques using deep learning.</p>
+            <a href="https://web.stanford.edu/class/cs224n/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Advanced</span>
+              <span class="tag">NLP</span>
+              <span class="tag">Academic</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced free ml">
+            <h3>Papers with Code</h3>
+            <p>Browse state-of-the-art ML papers with their corresponding open source implementations.</p>
+            <a href="https://paperswithcode.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Research</span>
+              <span class="tag">Implementation</span>
+            </div>
+          </li>
+
+          <!-- Course Resources -->
+          <li class="resource-item" data-category="courses free ml">
+            <h3>edX: CS50's Introduction to AI with Python</h3>
+            <p>Harvard's course exploring the concepts and algorithms of AI.</p>
+            <a href="https://www.edx.org/learn/artificial-intelligence/harvard-university-cs50-s-introduction-to-artificial-intelligence-with-python" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free Audit</span>
+              <span class="tag">Python</span>
+              <span class="tag">CS Fundamentals</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="courses paid ml dl">
+            <h3>Udacity: AI Programming with Python</h3>
+            <p>Learn Python, NumPy, pandas, and PyTorch to build AI applications.</p>
+            <a href="https://www.udacity.com/course/ai-programming-python-nanodegree--nd089" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Paid</span>
+              <span class="tag">Nanodegree</span>
+              <span class="tag">Hands-on</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="courses free ml dl">
+            <h3>MIT OpenCourseWare: Intro to Deep Learning</h3>
+            <p>MIT's introductory course to deep learning methods and applications.</p>
+            <a href="http://introtodeeplearning.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Academic</span>
+              <span class="tag">Lectures</span>
+            </div>
+          </li>
+
+          <!-- Project Resources -->
+          <li class="resource-item" data-category="projects free ml dl">
+            <h3>Kaggle</h3>
+            <p>Practice with real-world datasets, participate in competitions, and learn from notebooks.</p>
+            <a href="https://www.kaggle.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Practice</span>
+              <span class="tag">Community</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="projects free ml dl">
+            <h3>Google Colab</h3>
+            <p>Free Jupyter notebook environment with GPU that requires no setup to use.</p>
+            <a href="https://colab.research.google.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">GPU Access</span>
+              <span class="tag">Python</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="projects free ml dl nlp">
+            <h3>TensorFlow Playground</h3>
+            <p>Interactive visualization of neural networks that helps build intuition.</p>
+            <a href="https://playground.tensorflow.org/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Interactive</span>
+              <span class="tag">Visualization</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="projects free ml dl">
+            <h3>GitHub: Awesome Machine Learning</h3>
+            <p>Curated list of ML frameworks, libraries, and software by language.</p>
+            <a href="https://github.com/josephmisiti/awesome-machine-learning" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Collection</span>
+              <span class="tag">Open Source</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div id="beginner" class="tab-content">
+        <ul class="resource-list">
+          <li class="resource-item" data-category="beginner free ml">
+            <h3>Elements of AI</h3>
+            <p>Free online course that introduces AI concepts without requiring programming background.</p>
+            <a href="https://www.elementsofai.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Beginner</span>
+              <span class="tag">AI Basics</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner free ml">
+            <h3>Google's Machine Learning Crash Course</h3>
+            <p>A quick introduction to practical machine learning concepts by Google.</p>
+            <a href="https://developers.google.com/machine-learning/crash-course" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Beginner</span>
+              <span class="tag">Machine Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner free ml dl">
+            <h3>Fast.ai</h3>
+            <p>Practical Deep Learning for Coders course that takes a top-down approach.</p>
+            <a href="https://www.fast.ai/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Beginner-Friendly</span>
+              <span class="tag">Deep Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner courses paid ml">
+            <h3>Coursera: AI For Everyone</h3>
+            <p>Non-technical course by Andrew Ng that covers AI concepts, terminology, and business implications.</p>
+            <a href="https://www.coursera.org/learn/ai-for-everyone" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Beginner</span>
+              <span class="tag">Non-Technical</span>
+              <span class="tag">Business Focus</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div id="advanced" class="tab-content">
+        <ul class="resource-list">
+          <li class="resource-item" data-category="advanced courses paid ml dl">
+            <h3>Deep Learning Specialization</h3>
+            <p>Comprehensive specialization by Andrew Ng covering neural networks, deep learning, and ML projects.</p>
+            <a href="https://www.coursera.org/specializations/deep-learning" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Paid</span>
+              <span class="tag">Comprehensive</span>
+              <span class="tag">Deep Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced free ml dl">
+            <h3>Hugging Face</h3>
+            <p>Learn to use and build with transformer models and NLP technologies.</p>
+            <a href="https://huggingface.co/learn" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">NLP</span>
+              <span class="tag">Transformers</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced courses paid dl nlp">
+            <h3>Stanford CS224N: NLP with Deep Learning</h3>
+            <p>Deep dive into modern NLP techniques using deep learning.</p>
+            <a href="https://web.stanford.edu/class/cs224n/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Advanced</span>
+              <span class="tag">NLP</span>
+              <span class="tag">Academic</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced free ml">
+            <h3>Papers with Code</h3>
+            <p>Browse state-of-the-art ML papers with their corresponding open source implementations.</p>
+            <a href="https://paperswithcode.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Research</span>
+              <span class="tag">Implementation</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div id="courses" class="tab-content">
+        <ul class="resource-list">
+          <li class="resource-item" data-category="courses free ml">
+            <h3>edX: CS50's Introduction to AI with Python</h3>
+            <p>Harvard's course exploring the concepts and algorithms of AI.</p>
+            <a href="https://www.edx.org/learn/artificial-intelligence/harvard-university-cs50-s-introduction-to-artificial-intelligence-with-python" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free Audit</span>
+              <span class="tag">Python</span>
+              <span class="tag">CS Fundamentals</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="courses paid ml dl">
+            <h3>Udacity: AI Programming with Python</h3>
+            <p>Learn Python, NumPy, pandas, and PyTorch to build AI applications.</p>
+            <a href="https://www.udacity.com/course/ai-programming-python-nanodegree--nd089" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Paid</span>
+              <span class="tag">Nanodegree</span>
+              <span class="tag">Hands-on</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="courses free ml dl">
+            <h3>MIT OpenCourseWare: Intro to Deep Learning</h3>
+            <p>MIT's introductory course to deep learning methods and applications.</p>
+            <a href="http://introtodeeplearning.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Academic</span>
+              <span class="tag">Lectures</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="beginner courses paid ml">
+            <h3>Coursera: AI For Everyone</h3>
+            <p>Non-technical course by Andrew Ng that covers AI concepts, terminology, and business implications.</p>
+            <a href="https://www.coursera.org/learn/ai-for-everyone" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Beginner</span>
+              <span class="tag">Non-Technical</span>
+              <span class="tag">Business Focus</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced courses paid ml dl">
+            <h3>Deep Learning Specialization</h3>
+            <p>Comprehensive specialization by Andrew Ng covering neural networks, deep learning, and ML projects.</p>
+            <a href="https://www.coursera.org/specializations/deep-learning" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Paid</span>
+              <span class="tag">Comprehensive</span>
+              <span class="tag">Deep Learning</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="advanced courses paid dl nlp">
+            <h3>Stanford CS224N: NLP with Deep Learning</h3>
+            <p>Deep dive into modern NLP techniques using deep learning.</p>
+            <a href="https://web.stanford.edu/class/cs224n/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Advanced</span>
+              <span class="tag">NLP</span>
+              <span class="tag">Academic</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div id="projects" class="tab-content">
+        <ul class="resource-list">
+          <li class="resource-item" data-category="projects free ml dl">
+            <h3>Kaggle</h3>
+            <p>Practice with real-world datasets, participate in competitions, and learn from notebooks.</p>
+            <a href="https://www.kaggle.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Practice</span>
+              <span class="tag">Community</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="projects free ml dl">
+            <h3>Google Colab</h3>
+            <p>Free Jupyter notebook environment with GPU that requires no setup to use.</p>
+            <a href="https://colab.research.google.com/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">GPU Access</span>
+              <span class="tag">Python</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="projects free ml dl nlp">
+            <h3>TensorFlow Playground</h3>
+            <p>Interactive visualization of neural networks that helps build intuition.</p>
+            <a href="https://playground.tensorflow.org/" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Interactive</span>
+              <span class="tag">Visualization</span>
+            </div>
+          </li>
+          <li class="resource-item" data-category="projects free ml dl">
+            <h3>GitHub: Awesome Machine Learning</h3>
+            <p>Curated list of ML frameworks, libraries, and software by language.</p>
+            <a href="https://github.com/josephmisiti/awesome-machine-learning" target="_blank">View Resource</a>
+            <div class="tags">
+              <span class="tag">Free</span>
+              <span class="tag">Collection</span>
+              <span class="tag">Open Source</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Last Updated: May 2025 | Curated resources for AI learning</p>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching functionality
+    function switchTab(tabId) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Deactivate all tabs
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Activate the selected tab and its content
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+    }
+
+    // Filter functionality
+    let activeFilters = ['all'];
+    
+    function toggleFilter(button, filter) {
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      
+      // Toggle 'all' filter
+      if (filter === 'all') {
+        activeFilters = ['all'];
+        filterButtons.forEach(btn => {
+          btn.classList.remove('active');
+        });
+        button.classList.add('active');
+      } else {
+        // Remove 'all' filter if it's active
+        if (activeFilters.includes('all')) {
+          activeFilters = [];
+          document.querySelector('.filter-btn[onclick="toggleFilter(this, \'all\')"]').classList.remove('active');
+        }
+        
+        // Toggle the selected filter
+        if (activeFilters.includes(filter)) {
+          activeFilters = activeFilters.filter(f => f !== filter);
+          button.classList.remove('active');
+          
+          // If no filters are active, activate 'all'
+          if (activeFilters.length === 0) {
+            activeFilters = ['all'];
+            document.querySelector('.filter-btn[onclick="toggleFilter(this, \'all\')"]').classList.add('active');
+          }
+        } else {
+          activeFilters.push(filter);
+          button.classList.add('active');
+        }
+      }
+      
+      filterResources();
+    }
+
+    // Search and filter resources
+    function filterResources() {
+      const searchText = document.getElementById('searchBox').value.toLowerCase();
+      const resourceItems = document.querySelectorAll('.resource-item');
+      
+      resourceItems.forEach(item => {
+        const itemText = item.textContent.toLowerCase();
+        const itemCategories = item.getAttribute('data-category').split(' ');
+        
+        // Check if item matches search text
+        const matchesSearch = searchText === '' || itemText.includes(searchText);
+        
+        // Check if item matches active filters
+        let matchesFilter = false;
+        if (activeFilters.includes('all')) {
+          matchesFilter = true;
+        } else {
+          activeFilters.forEach(filter => {
+            if (itemCategories.includes(filter)) {
+              matchesFilter = true;
+            }
+          });
+        }
+        
+        // Show or hide item based on search and filter matches
+        if (matchesSearch && matchesFilter) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Initial filtering
+    filterResources();
+  </script>
+</body>
+</html>
 -
 -  <li><a href="wordcatch/">Word Catch</a></li>
     <li><a href="learnsmart/">LearnSmart</a></li>

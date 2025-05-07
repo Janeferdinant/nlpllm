@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnSmart</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.5s ease;
+    }
+    canvas {
+      border: 2px solid #333;
+      background-color: #fff;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1e40af;
+      margin: 1rem 0;
+      text-align: center;
+    }
+    p {
+      font-size: 1.5rem;
+      color: #4b5563;
+      line-height: 1.5;
+      text-align: center;
+    }
+    #welcome, #dashboard, #readingArea, #mathArea, #scoreDisplay, #status {
+      max-width: 600px;
+      text-align: center;
+      margin: 10px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f0f4f8;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: opacity 0.5s ease;
+    }
+    #scoreDisplay {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2563eb;
+      background-color: #e0f7fa;
+    }
+    #status {
+      font-size: 1rem;
+      color: #4b5563;
+    }
+    button {
+      font-size: 1.2rem;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+      min-width: 48px;
+      min-height: 48px;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .mode-button {
+      background-color: #3b82f6;
+    }
+    .mode-button:hover {
+      background-color: #2563eb;
+    }
+    .action-button {
+      background-color: #22c55e;
+    }
+    .action-button:hover {
+      background-color: #16a34a;
+    }
+    .vocab-option {
+      display: inline-block;
+      padding: 10px;
+      margin: 5px;
+      background-color: #e0f7fa;
+      border: 1px solid #b2ebf2;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .vocab-option:hover {
+      background-color: #b2ebf2;
+    }
+    .answer-options, .vocab-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    #dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .mode-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .mode-card:hover {
+      transform: scale(1.05);
+    }
+    .mode-card span {
+      font-size: 1.5rem;
+      margin-right: 10px;
+    }
+    #readingArea .passage {
+      background-color: #f0f8ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
+    #mathArea .problem {
+      background-color: #fff3e0;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
+    body.animals {
+      background: linear-gradient(to bottom, #f0f4c3, #d9e49e);
+    }
+    body.space {
+      background: radial-gradient(circle, #001f3f, #000000);
+      color: white;
+    }
+    body.space button, body.space .vocab-option {
+      background-color: #FFD700;
+      color: black;
+    }
+    body.space .mode-card {
+      background-color: #1e3a8a;
+      color: white;
+    }
+    body.adventure {
+      background: linear-gradient(to bottom, #8B4513, #A0522D);
+      color: white;
+    }
+    body.adventure button, body.adventure .vocab-option {
+      background-color: #FF4500;
+      color: white;
+    }
+    body.adventure .mode-card {
+      background-color: #A0522D;
+      color: white;
+    }
+    @media (max-width: 600px) {
+      #dashboard {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      p {
+        font-size: 1.2rem;
+      }
+      button {
+        font-size: 1rem;
+        padding: 10px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="welcome">
+    <h1>LearnSmart</h1>
+    <p>What do you like best?</p>
+    <button onclick="setInterest('animals')">🐾 Animals</button>
+    <button onclick="setInterest('space')">🚀 Space</button>
+    <button onclick="setInterest('adventure')">🗺️ Adventure</button>
+  </div>
+  <div id="dashboard" style="display: none;">
+    <h1>LearnSmart</h1>
+    <p>Choose a mode to learn!</p>
+    <div class="mode-card" onclick="showReading()">
+      <span>📚</span> Reading
+    </div>
+    <div class="mode-card" onclick="showMath()">
+      <span>🧮</span> Math
+    </div>
+  </div>
+  <div id="scoreDisplay">Score: 0</div>
+  <div id="status"></div>
+  <div id="readingArea" style="display: none;"></div>
+  <div id="mathArea" style="display: none;"></div>
+  <canvas id="canvas"></canvas>
+  <script>
+    let score = 0;
+    let level = 0;
+    let interest = '';
+    let passage = '';
+    let animationState = { x: 0, y: 0, speed: 2 };
+    const content = {
+      animals: {
+        passages: [
+          'A little cat ran to a tree. A bird flew high. The cat wanted to play.',
+          'The dog chased a squirrel in the park. It barked happily.'
+        ],
+        questions: [
+          { q: 'What did the cat see?', options: ['A bird', 'A dog', 'A car'], correct: 'A bird' },
+          { q: 'What did the dog chase?', options: ['A squirrel', 'A cat', 'A ball'], correct: 'A squirrel' }
+        ],
+        vocab: [
+          { word: 'ran', meaning: 'Moved fast' },
+          { word: 'barked', meaning: 'Made a loud sound' }
+        ],
+        animation: drawCat
+      },
+      space: {
+        passages: [
+          'A rocket zoomed to the stars. It saw a bright moon.',
+          'The astronaut floated near a comet. It sparkled brightly.'
+        ],
+        questions: [
+          { q: 'What did the rocket see?', options: ['A moon', 'A sun', 'A cloud'], correct: 'A moon' },
+          { q: 'What did the astronaut see?', options: ['A comet', 'A planet', 'A star'], correct: 'A comet' }
+        ],
+        vocab: [
+          { word: 'zoomed', meaning: 'Went very fast' },
+          { word: 'sparkled', meaning: 'Shined brightly' }
+        ],
+        animation: drawRocket
+      },
+      adventure: {
+        passages: [
+          'Sam found a map in a cave. It led to treasure.',
+          'Lila climbed a mountain. She saw a hidden valley.'
+        ],
+        questions: [
+          { q: 'What did Sam find?', options: ['A map', 'A book', 'A toy'], correct: 'A map' },
+          { q: 'What did Lila see?', options: ['A valley', 'A river', 'A forest'], correct: 'A valley' }
+        ],
+        vocab: [
+          { word: 'treasure', meaning: 'Valuable things' },
+          { word: 'hidden', meaning: 'Not easily seen' }
+        ],
+        animation: drawTreasure
+      }
+    };
+
+    function setup() {
+      let canvas = createCanvas(600, 400);
+      canvas.parent('canvas');
+      textAlign(LEFT, TOP);
+      textSize(16);
+      background(255);
+      loadProgress();
+      if (localStorage.getItem('interest')) {
+        interest = localStorage.getItem('interest');
+        document.body.className = interest;
+        showDashboard();
+      }
+      setupVoiceCommands();
+    }
+
+    function draw() {
+      background(255);
+      if (passage) {
+        textWrap(WORD);
+        text(passage, 20, 20, 560);
+      }
+      if (interest && content[interest] && content[interest].animation) {
+        content[interest].animation();
+      }
+    }
+
+    function drawCat() {
+      animationState.x += animationState.speed;
+      if (animationState.x > width || animationState.x < 0) animationState.speed *= -1;
+      fill(255, 165, 0);
+      ellipse(animationState.x, height / 2, 50, 50);
+      fill(0);
+      triangle(animationState.x - 20, height / 2 - 25, animationState.x - 30, height / 2 - 40, animationState.x - 10, height / 2 - 25);
+      triangle(animationState.x + 20, height / 2 - 25, animationState.x + 30, height / 2 - 40, animationState.x + 10, height / 2 - 25);
+    }
+
+    function drawRocket() {
+      animationState.y -= animationState.speed;
+      if (animationState.y < 0 || animationState.y > height) animationState.speed *= -1;
+      fill(169, 169, 169);
+      rect(width / 2, animationState.y, 20, 40);
+      fill(255, 0, 0);
+      triangle(width / 2, animationState.y + 40, width / 2 + 10, animationState.y + 60, width / 2 + 20, animationState.y + 40);
+    }
+
+    function drawTreasure() {
+      fill(255, 215, 0);
+      rect(width / 2 - 30, height / 2 - 20, 60, 40);
+      fill(0);
+      ellipse(width / 2, height / 2, 10, 10);
+    }
+
+    function drawApples() {
+      fill(255, 0, 0);
+      for (let i = 0; i < 5; i++) {
+        ellipse(100 + i * 60, height / 2 + sin(frameCount * 0.05 + i) * 20, 40, 40);
+      }
+    }
+
+    window.setInterest = function(newInterest) {
+      interest = newInterest;
+      localStorage.setItem('interest', interest);
+      document.body.className = interest;
+      showDashboard();
+    };
+
+    function showDashboard() {
+      document.getElementById('welcome').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'grid';
+      document.getElementById('readingArea').style.display = 'none';
+      document.getElementById('mathArea').style.display = 'none';
+    }
+
+    window.showReading = function() {
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('readingArea').style.display = 'block';
+      displayReading();
+    };
+
+    window.showMath = function() {
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('mathArea').style.display = 'block';
+      displayMath();
+    };
+
+    function displayReading() {
+      if (!content[interest]) return;
+      const passageIndex = level % content[interest].passages.length;
+      passage = content[interest].passages[passageIndex];
+      const question = content[interest].questions[passageIndex];
+      const vocabPair = content[interest].vocab[passageIndex];
+      document.getElementById('readingArea').innerHTML = `
+        <div class="passage">${passage}</div>
+        <p><strong>Question:</strong> ${question.q}</p>
+        <div class="answer-options">
+          ${question.options.map(opt => `<button class="action-button" onclick="checkReadingAnswer('${opt}', '${question.correct}')">${opt}</button>`).join('')}
+        </div>
+        <p><strong>Match the word:</strong> ${vocabPair.word}</p>
+        <div class="vocab-options">
+          <div class="vocab-option" onclick="checkVocab('${vocabPair.meaning}', '${vocabPair.meaning}')">${vocabPair.meaning}</div>
+          <div class="vocab-option" onclick="checkVocab('Wrong meaning', '${vocabPair.meaning}')">Wrong meaning</div>
+        </div>
+      `;
+      document.getElementById('status').innerText = 'Read the story, answer the question, and match the word!';
+      speakPassage(passage);
+    }
+
+    window.checkReadingAnswer = function(answer, correct) {
+      if (answer === correct) {
+        score += 5;
+        document.getElementById('status').innerText = 'Correct! Great job!';
+        speak('Great job!');
+      } else {
+        document.getElementById('status').innerText = 'Try again!';
+      }
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+      saveProgress();
+    };
+
+    window.checkVocab = function(selected, correct) {
+      if (selected === correct) {
+        score += 3;
+        document.getElementById('status').innerText = 'Word matched! Awesome!';
+        speak('Awesome!');
+        level++;
+        displayReading();
+      } else {
+        document.getElementById('status').innerText = 'Wrong match. Try again!';
+      }
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+      saveProgress();
+    };
+
+    const mathProblems = [
+      { q: '2 + 3 = ?', options: ['5', '6', '4'], correct: '5', animation: drawApples },
+      { q: '5 - 2 = ?', options: ['3', '2', '4'], correct: '3', animation: drawApples }
+    ];
+
+    function displayMath() {
+      const problemIndex = level % mathProblems.length;
+      const problem = mathProblems[problemIndex];
+      content[interest].animation = problem.animation;
+      document.getElementById('mathArea').innerHTML = `
+        <div class="problem">${problem.q}</div>
+        <div class="answer-options">
+          ${problem.options.map(opt => `<button class="action-button" onclick="checkMathAnswer('${opt}', '${problem.correct}')">${opt}</button>`).join('')}
+        </div>
+      `;
+      document.getElementById('status').innerText = 'Solve the math problem and watch the animation!';
+      speak(problem.q);
+    }
+
+    window.checkMathAnswer = function(answer, correct) {
+      if (answer === correct) {
+        score += 5;
+        document.getElementById('status').innerText = 'Correct! You’re a math star!';
+        speak('You’re a math star!');
+        level++;
+        displayMath();
+      } else {
+        document.getElementById('status').innerText = 'Try again!';
+      }
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+      saveProgress();
+    };
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakPassage(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
+    function setupVoiceCommands() {
+      if (!window.webkitSpeechRecognition) return;
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.onresult = function(event) {
+        const command = event.results[0][0].transcript.toLowerCase();
+        if (command.includes('read')) {
+          showReading();
+          document.getElementById('status').innerText = 'Opening reading mode!';
+        } else if (command.includes('math')) {
+          showMath();
+          document.getElementById('status').innerText = 'Opening math mode!';
+        }
+      };
+      recognition.onerror = function() {
+        document.getElementById('status').innerText = 'Voice command not recognized. Try again!';
+      };
+      document.getElementById('welcome').addEventListener('click', () => recognition.start());
+      document.getElementById('dashboard').addEventListener('click', () => recognition.start());
+    }
+
+    function saveProgress() {
+      localStorage.setItem('learnSmartScore', score);
+      localStorage.setItem('learnSmartLevel', level);
+    }
+
+    function loadProgress() {
+      score = parseInt(localStorage.getItem('learnSmartScore')) || 0;
+      level = parseInt(localStorage.getItem('learnSmartLevel')) || 0;
+      document.getElementById('scoreDisplay').innerText = 'Score: ' + score;
+    }
+  </script>
+</body>
+</html>
